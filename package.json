@@ -1,0 +1,44 @@
+{
+  "name": "@nohira/cardinal-system",
+  "version": "0.0.1",
+  "description": "Implementation of CQRS pattern",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "tsc -d",
+    "ci:build": "tsc -d",
+    "pretest": "npm-run-all lint build",
+    "lint": "tslint 'src/**/*.ts' 'test/**/*.ts'",
+    "fix:lint": "npm run lint -- --fix",
+    "ci:test:unit": "mocha -c --recursive dist/test/unit",
+    "ci:test:integration": "echo mocha -c --recursive dist/test/integration",
+    "test": "npm-run-all ci:test:*",
+    "cover:coverage": "istanbul cover _mocha -- -u exports -R spec dist/test/**/*.spec.js",
+    "cover:remap": "remap-istanbul -i coverage/coverage.json -o coverage/coverage-final.json -t json-summary",
+    "cover": "npm-run-all cover:*",
+    "precommit": "npm run test",
+    "release": "np --no-publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nohira/cardinal-system.git"
+  },
+  "keywords": [
+    "onnet"
+  ],
+  "author": "nohira",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nohira/cardinal-system/issues"
+  },
+  "homepage": "https://github.com/nohira/cardinal-system#readme",
+  "devDependencies": {
+    "@types/chai": "^3.5.1",
+    "@types/mocha": "^2.2.41",
+    "chai": "^3.5.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
