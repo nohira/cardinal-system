@@ -1,3 +1,3 @@
-declare type Topic = string;
+export type Topic = string;
 
 export default Topic;
