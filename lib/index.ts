@@ -5,3 +5,5 @@ export * from '../src/interface/IContent';
 export * from '../src/interface/IPublisher';
 export * from '../src/interface/ISubscriber';
 export * from '../src/interface/IMessageQueue';
+
+export * from '../src/message/Message';
