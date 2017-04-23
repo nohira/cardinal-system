@@ -2,7 +2,8 @@ module.exports = function (wallaby) {
     return {
         files : [
             'src/**/*.ts',
-            'test/unit/mock/**/*.ts'
+            'test/unit/mock/**/*.ts',
+            'lib/index.ts'
         ],
         tests : ['test/**/*.spec.ts*'],
         compilers : {
