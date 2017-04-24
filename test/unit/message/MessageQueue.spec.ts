@@ -242,17 +242,19 @@ describe('MessageQueue test suite', () => {
 
             const oldConsoleWarn = console.warn;
 
-            before(() => {
-                console.warn = function () {};
-            });
-
-            after(() => {
-                console.warn = oldConsoleWarn;
-            });
-
             let subscriberSpy1 : SinonSpy;
             let subscriberSpy2 : SinonSpy;
             let subscriberSpy3 : SinonSpy;
+
+            const maskConsole = () => {
+                console.warn   = function () {};
+                consoleWarnSpy = spy(console, 'warn');
+            };
+
+            const unmaskConsole = () => {
+                consoleWarnSpy.restore();
+                console.warn = oldConsoleWarn;
+            };
 
             beforeEach(() => {
                 const subscriber1 = new MockSubscriber(topic1);
@@ -262,7 +264,6 @@ describe('MessageQueue test suite', () => {
                 subscriberSpy1 = spy(subscriber1, 'execute');
                 subscriberSpy2 = spy(subscriber2, 'execute');
                 subscriberSpy3 = spy(subscriber3, 'execute');
-                consoleWarnSpy = spy(console, 'warn');
 
                 messageQueue = factory()();
 
@@ -275,22 +276,31 @@ describe('MessageQueue test suite', () => {
                 subscriberSpy1.restore();
                 subscriberSpy2.restore();
                 subscriberSpy3.restore();
-                consoleWarnSpy.restore();
             });
 
             it('should return itself', () => {
+                maskConsole();
+
                 const message : IMessage<MockContent> = messageFactory(topic1);
 
                 expect(messageQueue.publish<MockContent>(message)).to.equal(messageQueue);
+
+                unmaskConsole();
             });
 
             it('should warn if topic has no subscribers', () => {
+                maskConsole();
+
                 messageQueue.publish<MockContent>(messageFactory(topic3));
 
                 expect(consoleWarnSpy.callCount).to.equal(1);
+
+                unmaskConsole();
             });
 
             it('should do nothing if there is no subscribers for topic', () => {
+                maskConsole();
+
                 const message : IMessage<MockContent> = messageFactory(topic3);
 
                 messageQueue.publish(message);
@@ -298,6 +308,8 @@ describe('MessageQueue test suite', () => {
                 expect(subscriberSpy1.notCalled).to.equal(true);
                 expect(subscriberSpy2.notCalled).to.equal(true);
                 expect(subscriberSpy3.notCalled).to.equal(true);
+
+                unmaskConsole();
             });
 
             it('should not execute subscribers for other topics', () => {
@@ -335,36 +347,36 @@ describe('MessageQueue test suite', () => {
             let consoleGroupEndSpy : SinonSpy;
             let consoleWarnSpy : SinonSpy;
 
+            const maskConsole = () => {
+                console.log    = function () {};
+                console.warn   = function () {};
+                consoleLogSpy  = spy(console, 'log');
+                consoleWarnSpy = spy(console, 'warn');
+            };
+
+            const unmaskConsole = () => {
+                consoleLogSpy.restore();
+                consoleWarnSpy.restore();
+                console.log  = oldConsoleLog;
+                console.warn = oldConsoleWarn;
+            };
+
             const oldConsoleLog            = console.log;
             const oldConsoleGroup          = console.group;
             const oldConsoleGroupCollapsed = console.groupCollapsed;
             const oldConsoleGroupEnd       = console.groupEnd;
             const oldConsoleWarn           = console.warn;
 
-            before(() => {
-                console.log            = function () {};
-                console.group          = function () {};
-                console.groupCollapsed = function () {};
-                console.groupEnd       = function () {};
-                console.warn           = function () {};
-            });
-
-            after(() => {
-                console.log            = oldConsoleLog;
-                console.group          = oldConsoleGroup;
-                console.groupCollapsed = oldConsoleGroupCollapsed;
-                console.groupEnd       = oldConsoleGroupEnd;
-                console.warn           = oldConsoleWarn;
-            });
-
             beforeEach(() => {
                 const subscriber = new MockSubscriber(topic1);
 
-                consoleLogSpy            = spy(console, 'log');
+                console.group          = function () {};
+                console.groupCollapsed = function () {};
+                console.groupEnd       = function () {};
+
                 consoleGroupSpy          = spy(console, 'group');
                 consoleGroupCollapsedSpy = spy(console, 'groupCollapsed');
                 consoleGroupEndSpy       = spy(console, 'groupEnd');
-                consoleWarnSpy           = spy(console, 'warn');
 
                 messageQueue = factory()();
 
@@ -372,11 +384,13 @@ describe('MessageQueue test suite', () => {
             });
 
             afterEach(() => {
-                consoleLogSpy.restore();
                 consoleGroupSpy.restore();
                 consoleGroupCollapsedSpy.restore();
                 consoleGroupEndSpy.restore();
-                consoleWarnSpy.restore();
+
+                console.group          = oldConsoleGroup;
+                console.groupCollapsed = oldConsoleGroupCollapsed;
+                console.groupEnd       = oldConsoleGroupEnd;
             });
 
             it('should return itself', () => {
@@ -384,6 +398,8 @@ describe('MessageQueue test suite', () => {
             });
 
             it('should not log by default', () => {
+                maskConsole();
+
                 messageQueue.publish(messageFactory(topic1));
 
                 expect(consoleLogSpy.notCalled).to.equal(true);
@@ -391,9 +407,13 @@ describe('MessageQueue test suite', () => {
                 expect(consoleGroupCollapsedSpy.notCalled).to.equal(true);
                 expect(consoleGroupEndSpy.notCalled).to.equal(true);
                 expect(consoleWarnSpy.notCalled).to.equal(true);
+
+                unmaskConsole();
             });
 
             it('should not log if trace is setted to false', () => {
+                maskConsole();
+
                 messageQueue.publish(messageFactory(topic1));
 
                 expect(consoleLogSpy.notCalled).to.equal(true);
@@ -401,9 +421,13 @@ describe('MessageQueue test suite', () => {
                 expect(consoleGroupCollapsedSpy.notCalled).to.equal(true);
                 expect(consoleGroupEndSpy.notCalled).to.equal(true);
                 expect(consoleWarnSpy.notCalled).to.equal(true);
+
+                unmaskConsole();
             });
 
             it('should log if trace is setted to true', () => {
+                maskConsole();
+
                 messageQueue.setTrace(true);
 
                 messageQueue.publish(messageFactory(topic1));
@@ -412,6 +436,8 @@ describe('MessageQueue test suite', () => {
                 expect(consoleGroupSpy.called).to.equal(true);
                 expect(consoleGroupCollapsedSpy.called).to.equal(true);
                 expect(consoleGroupEndSpy.called).to.equal(true);
+
+                unmaskConsole();
             });
 
         });
