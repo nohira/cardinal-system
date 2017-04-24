@@ -32,7 +32,7 @@ describe('Message test suite', () => {
 
         let message : IMessage<MockContent>;
 
-        describe('Initialization with 2 parameters', () => {
+        describe('Initialization (2 parameters)', () => {
 
             beforeEach(() => {
                 message = factory(publisher, topic)();
@@ -52,7 +52,7 @@ describe('Message test suite', () => {
 
         });
 
-        describe('Initialization with 3 parameters', () => {
+        describe('Initialization (3 parameters)', () => {
 
             beforeEach(() => {
                 message = factory(publisher, topic, content)();
