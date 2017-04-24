@@ -7,3 +7,4 @@ export * from '../src/interface/ISubscriber';
 export * from '../src/interface/IMessageQueue';
 
 export * from '../src/message/Message';
+export * from '../src/message/MessageQueue';
